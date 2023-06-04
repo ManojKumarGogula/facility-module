@@ -104,6 +104,7 @@ const FacilityBookingModule = () => {
         onClose={handleChange}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        style={{ zIndex: 999 }}
       >
         <Box sx={style}>
           {renderContent()}
@@ -123,10 +124,12 @@ const FacilityBookingModule = () => {
   return (
     <div className="flex flex-col justify-center items-center h-screen  ">
       {renderPaymentModel()}
-      <div className="flex justify-center items-center flex-col border-bluebg border-1 shadow-13 rounded-8 px-[6vw] py-[2vh]">
-        <h1 className="text-24 mt-[1vh]">Facility Booking Module</h1>
+      <div className="flex justify-center items-center flex-col border-bluebg border-1 shadow-13 rounded-8 px-[6vw] py-[2vh] w-[80%] md:w-auto xl:w-auto">
+        <h1 className="text-14 md:text-20 xl:text-24 mt-[1vh]">
+          Facility Booking Module
+        </h1>
         <form onSubmit={handleSubmit} className="my-[10vh]">
-          <div className="my-[8vh]">
+          <div className="flex flex-col md:flex-col xl:flex-row xl:items-center">
             <label htmlFor="facility" className="mr-[3vw]">
               Facility:
             </label>
@@ -134,7 +137,7 @@ const FacilityBookingModule = () => {
               id="facility"
               value={selectedFacility}
               onChange={handleFacilityChange}
-              className="border-1 border-bluebg rounded-4 p-4 w-[11vw]"
+              className="border-1 border-bluebg rounded-4 p-4 w-[50vw] md:w-[30vw] xl:w-[11vw]"
             >
               <option value="">Select a facility</option>
               <option value="clubhouse">Clubhouse</option>
@@ -142,7 +145,7 @@ const FacilityBookingModule = () => {
             </select>
           </div>
           {
-            <div className="my-[8vh]">
+            <div className="my-[2vh] flex flex-col md:flex-col xl:flex-row xl:items-center">
               <label htmlFor="timeSlot" className="mr-[2vw]">
                 Time Slot:
               </label>
@@ -150,7 +153,7 @@ const FacilityBookingModule = () => {
                 id="timeSlot"
                 value={selectedTimeSlot}
                 onChange={handleTimeSlotChange}
-                className="border-1 border-bluebg rounded-4 p-4 w-[11vw]"
+                className="border-1 border-bluebg rounded-4 p-4 w-[50vw] md:w-[30vw] xl:w-[11vw]"
               >
                 <option value="">Select a time slot</option>
                 {selectedFacility && (
@@ -178,8 +181,8 @@ const FacilityBookingModule = () => {
           </p>
         )} */}
       </div>
-      <div onClick={()=>navigate("/")} >
-        <img src={homeImage}  />
+      <div onClick={() => navigate("/")}>
+        <img src={homeImage} />
       </div>
     </div>
   );
