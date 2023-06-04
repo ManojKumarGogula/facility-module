@@ -121,10 +121,10 @@ const FacilityBookingModule = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen ">
+    <div className="flex flex-col justify-center items-center h-screen  ">
       {renderPaymentModel()}
       <div className="flex justify-center items-center flex-col border-bluebg border-1 shadow-13 rounded-8 px-[6vw] py-[2vh]">
-        <h1 className="text-24">Facility Booking Module</h1>
+        <h1 className="text-24 mt-[1vh]">Facility Booking Module</h1>
         <form onSubmit={handleSubmit} className="my-[10vh]">
           <div className="my-[8vh]">
             <label htmlFor="facility" className="mr-[3vw]">
@@ -134,7 +134,7 @@ const FacilityBookingModule = () => {
               id="facility"
               value={selectedFacility}
               onChange={handleFacilityChange}
-              className="border-1 border-bluebg rounded-4 p-4"
+              className="border-1 border-bluebg rounded-4 p-4 w-[11vw]"
             >
               <option value="">Select a facility</option>
               <option value="clubhouse">Clubhouse</option>
@@ -150,7 +150,7 @@ const FacilityBookingModule = () => {
                 id="timeSlot"
                 value={selectedTimeSlot}
                 onChange={handleTimeSlotChange}
-                className="border-1 border-bluebg rounded-4 p-4"
+                className="border-1 border-bluebg rounded-4 p-4 w-[11vw]"
               >
                 <option value="">Select a time slot</option>
                 {selectedFacility && (
