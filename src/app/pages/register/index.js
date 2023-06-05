@@ -61,7 +61,7 @@ const FacilityBookingModule = () => {
   };
 
   const calculateBookingAmount = () => {
-    let facilityData;
+    let cost;
 
     const errorLog = bookingData.filter((item, index) => {
       if (moment(item.date).isSame(date) && item.event == selectedFacility) {
@@ -77,21 +77,20 @@ const FacilityBookingModule = () => {
     const finalTime = getHours(endTime);
     const eventHours = finalTime - initialTime;
     if (selectedFacility == "clubhouse") {
-      if (initialTime > 10 && finalTime < 16) {
-        facilityData = { cost: eventHours * 100 };
-      } else if (initialTime > 16 && finalTime < 22) {
-        facilityData = { cost: eventHours * 500 };
+      if (initialTime >= 10 && finalTime <= 16) {
+        cost = eventHours * 100;
+      } else if (initialTime > 16 && finalTime <= 22) {
+        cost = eventHours * 500;
       }
-    } else if (selectedFacility == "tennisCourt") {
-      facilityData = { cost: eventHours * 50 };
+    } else {
+      cost = eventHours * 50;
     }
-    console.log("sel", facilityData, selectedFacility, initialTime, finalTime);
 
     setBookingData([
       ...bookingData,
       {
         event: selectedFacility,
-        ...facilityData,
+        cost: cost,
         date: date.format("YYYY-MM-DD"),
         startTime: startTime,
         endTime: endTime,
@@ -102,7 +101,7 @@ const FacilityBookingModule = () => {
       JSON.stringify([
         ...bookingData,
         {
-          ...facilityData,
+          cost: cost,
           event: selectedFacility,
           date: date.format("YYYY-MM-DD"),
           startTime: startTime,
