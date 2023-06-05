@@ -1,6 +1,11 @@
-import React, { useState, createRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Modal, Backdrop, Box } from "@mui/material";
+import { makeStyles } from "@mui/styles";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import moment from "moment";
+
 import homeImage from "../../asserts/images/home.png";
 
 const clubHouse =
@@ -22,39 +27,82 @@ const style = {
   p: 4,
 };
 
+const useStyles = makeStyles({
+  datePicker: {
+    "& .MuiOutlinedInput-root": {
+      border: "none",
+      outline: "none",
+
+    },
+    "&:focus": {
+      outline: "none",
+      boxShadow: "none",
+      borderColor: "transparent",
+    },
+  },
+});
 const FacilityBookingModule = () => {
   let bookingInfo = JSON.parse(localStorage.getItem("BOOKINGDATA"));
   const navigate = useNavigate();
   const [selectedFacility, setSelectedFacility] = useState("");
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState("");
-  const [bookingData, setBookingData] = useState({ ...bookingInfo });
+  const [bookingData, setBookingData] = useState([]);
   const [openPaymentModal, setPaymentModal] = useState(false);
   const [showError, setError] = useState(false);
+  const [date, setDate] = useState();
+  const [startTime, setStartTime] = useState();
+  const [endTime, setEndTime] = useState();
+  const classes = useStyles();
+
+  useEffect(() => {
+    if (bookingInfo) setBookingData([...bookingInfo]);
+  }, []);
 
   const handleFacilityChange = (event) => {
     setSelectedFacility(event.target.value);
   };
 
-  const handleTimeSlotChange = (event) => {
-    setSelectedTimeSlot(event.target.value);
-  };
   const calculateBookingAmount = () => {
     let facilityData;
-    if (bookingData[selectedFacility]) setError(true);
-    if (selectedFacility === "clubhouse") {
-      if (selectedTimeSlot === "10am-4pm") {
-        facilityData = { clubhouse: 100 };
-      } else if (selectedTimeSlot === "4pm-10pm") {
-        facilityData = { clubhouse: 500 };
-      }
-    } else if (selectedFacility === "tennisCourt") {
-      facilityData = { tennisCourt: 100 };
-    }
 
-    setBookingData({ ...bookingData, ...facilityData });
+    const currentDate = moment().format("YYYY-MM-DD");
+    const errorLog = bookingData.filter((item, index) => {
+      if (item.date == currentDate && item.event == selectedFacility)
+        return true;
+    });
+    console.log(errorLog);
+    if (errorLog) setError(true);
+    const initialTime = getHours(startTime);
+    const finalTime = getHours(endTime);
+    const eventHours = finalTime - initialTime;
+    if (selectedFacility == "clubhouse") {
+      if (initialTime > 10 && finalTime < 16) {
+        facilityData = { event: "clubhouse", cost: eventHours * 100 };
+      } else if (initialTime > 16 && finalTime < 22) {
+        facilityData = { event: "clubhouse", cost: eventHours * 500 };
+      }
+    } else if (selectedFacility == "tennisCourt") {
+      facilityData = { event: "tennisCourt", cost: eventHours * 50 };
+    }
+    setBookingData([
+      ...bookingData,
+      {
+        ...facilityData,
+        date: date.format("YYYY-MM-DD"),
+        startTime: startTime,
+        endTime: endTime,
+      },
+    ]);
     localStorage.setItem(
       "BOOKINGDATA",
-      JSON.stringify({ ...bookingData, ...facilityData })
+      JSON.stringify([
+        ...bookingData,
+        {
+          ...facilityData,
+          date: date.format("YYYY-MM-DD"),
+          startTime: startTime,
+          endTime: endTime,
+        },
+      ])
     );
   };
 
@@ -67,6 +115,13 @@ const FacilityBookingModule = () => {
   const handleChange = () => {
     setPaymentModal(!openPaymentModal);
     setError(false);
+  };
+
+  const getHours = (timeArg) => {
+    const time = moment(timeArg);
+    const hours = time.hours();
+    const minutes = time.minutes();
+    return hours + minutes / 60;
   };
 
   const renderContent = () => {
@@ -137,35 +192,59 @@ const FacilityBookingModule = () => {
               id="facility"
               value={selectedFacility}
               onChange={handleFacilityChange}
-              className="border-1 border-bluebg rounded-4 p-4 w-[50vw] md:w-[30vw] xl:w-[11vw]"
+              className="border-1 border-bluebg rounded-4 p-10 w-[50vw] md:w-[30vw] xl:w-[11vw]"
             >
-              <option value="">Select a facility</option>
-              <option value="clubhouse">Clubhouse</option>
-              <option value="tennisCourt">Tennis Court</option>
+              <option value="" className="my-8">
+                Select a facility
+              </option>
+              <option value="clubhouse" className="my-8">
+                Clubhouse
+              </option>
+              <option value="tennisCourt" className="my-8">
+                Tennis Court
+              </option>
             </select>
           </div>
-          {
-            <div className="my-[2vh] flex flex-col md:flex-col xl:flex-row xl:items-center">
-              <label htmlFor="timeSlot" className="mr-[2vw]">
-                Time Slot:
-              </label>
-              <select
-                id="timeSlot"
-                value={selectedTimeSlot}
-                onChange={handleTimeSlotChange}
-                className="border-1 border-bluebg rounded-4 p-4 w-[50vw] md:w-[30vw] xl:w-[11vw]"
-              >
-                <option value="">Select a time slot</option>
-                {selectedFacility && (
-                  <option value="10am-4pm">10am - 4pm</option>
-                )}
-                {selectedFacility === "clubhouse" && (
-                  <option value="4pm-10pm">4pm - 10pm</option>
-                )}
-              </select>
+          <div className="flex flex-col md:flex-col xl:flex-row xl:items-center my-[2vh]">
+            <div className="mr-[4.2vw]">Date:</div>
+            <div className=" w-[50vw] md:w-[30vw] xl:w-[11vw] border-1 border-bluebg rounded-4">
+              <DatePicker
+                value={date}
+                onChange={(newValue) => setDate(newValue)}
+                className={classes.datePicker}
+                disablePast
+              />
             </div>
-          }
-          {selectedFacility && selectedTimeSlot && (
+          </div>
+
+          <div className="flex flex-col md:flex-col xl:flex-row xl:items-center my-[2vh]">
+            <div className="mr-[1.6vw]"> Start Time:</div>
+            <div className=" w-[50vw] md:w-[30vw] xl:w-[11vw] border-1 border-bluebg rounded-4">
+              <TimePicker
+                value={startTime}
+                onChange={(newValue) => setStartTime(newValue)}
+                ampm={false}
+                minTime={moment().hours(10).minutes(0)}
+                maxTime={moment().hours(22).minutes(0)}
+                className={classes.datePicker}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col md:flex-col xl:flex-row xl:items-center my-[2vh]">
+            <div className="mr-[2vw]"> End Time:</div>
+
+            <div className=" w-[50vw] md:w-[30vw] xl:w-[11vw] border-1 border-bluebg rounded-4">
+              <TimePicker
+                value={endTime}
+                onChange={(newValue) => setEndTime(newValue)}
+                ampm={false} // Set to "false" for 24-hour format
+                minTime={moment().hours(10).minutes(0)}
+                maxTime={moment().hours(22).minutes(0)}
+                className={classes.datePicker}
+              />
+            </div>
+          </div>
+          {selectedFacility && startTime && endTime && date && (
             <button
               type="submit"
               className=" hover:border-redText mx-auto border-1 border-roundedboxbg shadow-4 p-2 px-6 rounded-2 hover:scale-110"
