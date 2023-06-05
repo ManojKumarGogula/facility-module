@@ -63,21 +63,8 @@ const FacilityBookingModule = () => {
   const calculateBookingAmount = () => {
     let facilityData;
 
-    const currentDate = moment().format("YYYY-MM-DD");
-    const errorLog = bookingData.map((item, index) => {
-      console.log(
-        item.date,
-        currentDate,
-        item.event,
-        selectedFacility,
-        "map",
-        moment(item.date).isSame(currentDate),
-        moment(item.date).isSame(currentDate) && item.event == selectedFacility
-      );
-      if (
-        moment(item.date).isSame(currentDate) &&
-        item.event == selectedFacility
-      ) {
+    const errorLog = bookingData.filter((item, index) => {
+      if (moment(item.date).isSame(date) && item.event == selectedFacility) {
         return true;
       }
     });
@@ -91,17 +78,19 @@ const FacilityBookingModule = () => {
     const eventHours = finalTime - initialTime;
     if (selectedFacility == "clubhouse") {
       if (initialTime > 10 && finalTime < 16) {
-        facilityData = { event: "clubhouse", cost: eventHours * 100 };
+        facilityData = { cost: eventHours * 100 };
       } else if (initialTime > 16 && finalTime < 22) {
-        facilityData = { event: "clubhouse", cost: eventHours * 500 };
+        facilityData = { cost: eventHours * 500 };
       }
     } else if (selectedFacility == "tennisCourt") {
-      facilityData = { event: "tennisCourt", cost: eventHours * 50 };
+      facilityData = { cost: eventHours * 50 };
     }
+    console.log("sel", facilityData, selectedFacility, initialTime, finalTime);
 
     setBookingData([
       ...bookingData,
       {
+        event: selectedFacility,
         ...facilityData,
         date: date.format("YYYY-MM-DD"),
         startTime: startTime,
@@ -114,6 +103,7 @@ const FacilityBookingModule = () => {
         ...bookingData,
         {
           ...facilityData,
+          event: selectedFacility,
           date: date.format("YYYY-MM-DD"),
           startTime: startTime,
           endTime: endTime,
@@ -163,8 +153,12 @@ const FacilityBookingModule = () => {
             className="object-fill w-full h-full"
           />
         </div>
-        <div>Date:26-10-2020</div>
-        <div>Price:{bookingData[selectedFacility]}</div>
+        <div className="text-16 font-400">
+          Date:{moment(date).format("YYYY-MM-DD")}
+        </div>
+        <div className="text-14 font-700">
+          Price:{bookingData[bookingData.length - 1]?.cost}
+        </div>
       </div>
     );
   };
