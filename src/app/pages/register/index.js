@@ -32,7 +32,6 @@ const useStyles = makeStyles({
     "& .MuiOutlinedInput-root": {
       border: "none",
       outline: "none",
-
     },
     "&:focus": {
       outline: "none",
@@ -65,12 +64,28 @@ const FacilityBookingModule = () => {
     let facilityData;
 
     const currentDate = moment().format("YYYY-MM-DD");
-    const errorLog = bookingData.filter((item, index) => {
-      if (item.date == currentDate && item.event == selectedFacility)
+    const errorLog = bookingData.map((item, index) => {
+      console.log(
+        item.date,
+        currentDate,
+        item.event,
+        selectedFacility,
+        "map",
+        moment(item.date).isSame(currentDate),
+        moment(item.date).isSame(currentDate) && item.event == selectedFacility
+      );
+      if (
+        moment(item.date).isSame(currentDate) &&
+        item.event == selectedFacility
+      ) {
         return true;
+      }
     });
-    console.log(errorLog);
-    if (errorLog) setError(true);
+    if (errorLog[0]) {
+      setError(true);
+      return;
+    }
+
     const initialTime = getHours(startTime);
     const finalTime = getHours(endTime);
     const eventHours = finalTime - initialTime;
@@ -83,6 +98,7 @@ const FacilityBookingModule = () => {
     } else if (selectedFacility == "tennisCourt") {
       facilityData = { event: "tennisCourt", cost: eventHours * 50 };
     }
+
     setBookingData([
       ...bookingData,
       {
@@ -253,12 +269,6 @@ const FacilityBookingModule = () => {
             </button>
           )}
         </form>
-        {/* {bookingData && selectedTimeSlot && (
-          <p>
-            Booking Amount: Rs. {bookingData[selectedFacility]}
-            /hour
-          </p>
-        )} */}
       </div>
       <div onClick={() => navigate("/")}>
         <img src={homeImage} />
