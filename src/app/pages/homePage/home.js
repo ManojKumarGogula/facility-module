@@ -26,7 +26,7 @@ const Home = () => {
           elegant lighting fixtures, and tasteful color schemes that create an
           inviting ambiance.
         </div>
-        <div className="text-redText text-10 font-600 mt-10">Please clear local storage if you face any issue</div>
+        {/* <div className="text-redText text-10 font-600 mt-10">Please clear local storage if you face any issue</div> */}
         <div>
           <button
             className=" py-[1vh] px-[2vw] rounded-8 my-[6vh] shadow-6 hover:scale-110"

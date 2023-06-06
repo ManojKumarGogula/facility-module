@@ -41,7 +41,7 @@ const useStyles = makeStyles({
   },
 });
 const FacilityBookingModule = () => {
-  let bookingInfo = JSON.parse(localStorage.getItem("BOOKINGDATA"));
+  let bookingInfo = JSON.parse(localStorage.getItem("INFO"));
   const navigate = useNavigate();
   const [selectedFacility, setSelectedFacility] = useState("");
   const [bookingData, setBookingData] = useState([]);
@@ -62,7 +62,6 @@ const FacilityBookingModule = () => {
 
   const calculateBookingAmount = () => {
     let cost;
-
     const errorLog = bookingData.filter((item, index) => {
       if (moment(item.date).isSame(date) && item.event == selectedFacility) {
         return true;
@@ -79,12 +78,15 @@ const FacilityBookingModule = () => {
     if (selectedFacility == "clubhouse") {
       if (initialTime >= 10 && finalTime <= 16) {
         cost = eventHours * 100;
-      } else if (initialTime > 16 && finalTime <= 22) {
+      } else if (initialTime >= 16 && finalTime <= 22) {
         cost = eventHours * 500;
+      } else if (finalTime > 16 && initialTime >= 10) {
+        cost = (finalTime - 16) * 500 + (16 - initialTime) * 100;
       }
     } else {
       cost = eventHours * 50;
     }
+    console.log(cost, initialTime, finalTime, eventHours, selectedFacility);
 
     setBookingData([
       ...bookingData,
@@ -97,7 +99,7 @@ const FacilityBookingModule = () => {
       },
     ]);
     localStorage.setItem(
-      "BOOKINGDATA",
+      "INFO",
       JSON.stringify([
         ...bookingData,
         {
